@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WALLPAPER="$HOME/Pictures/wallpapers/animated-city.gif"
+WALLPAPER="$HOME/Pictures/wallpapers/animated-totoro-rain.gif"
 
 # Kill swaybg if running (started by Omarchy default)
 pkill -x swaybg 2>/dev/null
