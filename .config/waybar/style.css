@@ -31,10 +31,17 @@
 }
 
 #cpu,
+#memory,
+#temperature,
+#disk,
 #battery,
 #pulseaudio,
 #custom-omarchy,
-#custom-update {
+#custom-update,
+#custom-network-speed,
+#custom-cpu-freq,
+#custom-gpu-stats,
+#custom-power-profile {
   min-width: 12px;
   margin: 0 7.5px;
 }
