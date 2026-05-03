@@ -1,7 +1,7 @@
 #!/bin/bash
 
-CACHE_FILE="/tmp/weather_cache.json"
-LOCATION_CACHE="/tmp/prayer_location.cache"
+CACHE_FILE="/tmp/weather_api_cache.json"
+LOCATION_CACHE="/tmp/weather_location.cache"
 CACHE_TTL=1800
 
 get_location() {

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ICON="󰥔"
-CACHE_FILE="/tmp/prayer_cache.json"
+CACHE_FILE="/tmp/prayer_api_cache.json"
 LOCATION_CACHE="/tmp/prayer_location.cache"
 CACHE_TTL=3600
 
@@ -59,7 +59,7 @@ get_data() {
     fi
 
     local yesterday
-    yesterday=$(date -d "1 day ago" +%Y-%m-%d 2>/dev/null || date -d "yesterday" +%Y-%m-%d 2>/dev/null)
+    yesterday=$(date -d "1 day ago" +%Y-%m-%d 2>/dev/null)
     if [[ -f "${CACHE_FILE}.${yesterday}" ]]; then
         cat "${CACHE_FILE}.${yesterday}"
         return 0

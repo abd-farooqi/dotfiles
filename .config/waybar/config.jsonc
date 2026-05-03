@@ -74,7 +74,7 @@
     "interval": 5,
     "format": "󰍛",
     "on-click": "omarchy-launch-or-focus-tui btop",
-    "on-click-right": "alacritty",
+    "on-click-right": "xdg-terminal-exec",
   },
   "memory": {
     "interval": 5,
@@ -83,7 +83,6 @@
   },
   "temperature": {
     "interval": 5,
-    "hwmon-path": "/sys/class/hwmon/hwmon7/temp1_input",
     "format": "󰔄",
     "critical-threshold": 85,
     "on-click": "omarchy-launch-or-focus-tui btop",
