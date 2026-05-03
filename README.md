@@ -48,7 +48,11 @@ dotfiles/
 │   │   ├── autostart.conf   # Startup applications
 │   │   ├── hypridle.conf    # Idle/suspend behavior
 │   │   ├── hyprlock.conf    # Lock screen appearance
-│   │   └── hyprsunset.conf  # Night light
+│   │   ├── hyprsunset.conf  # Night light
+│   │   └── scripts/
+│   │       ├── init-wallpaper.sh    # Animated wallpaper startup
+│   │       ├── wallpaper-watch.sh   # Monitor hotplug handler
+│   │       └── gen-wallpaper.sh     # Regenerate gradient GIF
 │   ├── waybar/              # Status bar
 │   │   ├── config.jsonc     # Bar layout & modules
 │   │   ├── style.css        # Bar styling
@@ -300,3 +304,32 @@ ls -d ~/.dotfiles-backup-*
 rm -rf ~/.config
 cp -r ~/.dotfiles-backup-<timestamp>/.config ~/.config
 ```
+
+## Animated Wallpaper
+
+The repo includes an animated wallpaper setup using [`awww`](https://codeberg.org/LGFae/awww) (a drop-in replacement for `swww` that supports animated GIFs).
+
+### How it works
+
+- `awww-daemon` starts automatically via `~/.config/hypr/autostart.conf`
+- `init-wallpaper.sh` kills the default `swaybg` (from Omarchy) and applies the animated GIF
+- `wallpaper-watch.sh` listens for monitor hotplug events and restores the wallpaper
+- `gen-wallpaper.sh` regenerates the gradient animation (run if you change screen resolution)
+
+### Customization
+
+To use your own animated wallpaper:
+
+```bash
+# Set any GIF file
+awww img /path/to/your/wallpaper.gif
+```
+
+To switch back to static wallpapers (Omarchy default):
+
+```bash
+pkill awww-daemon
+uwsm-app -- swaybg -i ~/.config/omarchy/current/background -m fill &
+```
+
+To make a permanent change, edit `~/.config/hypr/scripts/init-wallpaper.sh`.
