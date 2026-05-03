@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WALLPAPER="$HOME/Pictures/wallpapers/animated-mountain.gif"
+WALLPAPER="$HOME/.config/omarchy/current/background"
 
 # Kill swaybg if running (started by Omarchy default)
 pkill -x swaybg 2>/dev/null
@@ -11,5 +11,12 @@ if ! awww query &>/dev/null; then
     sleep 0.3
 fi
 
-# Set the animated wallpaper
-awww img "$WALLPAPER" 2>/dev/null || true
+# Set the wallpaper via Omarchy symlink
+if [[ -L "$WALLPAPER" ]]; then
+    TARGET=$(readlink "$WALLPAPER")
+    awww img "$TARGET" 2>/dev/null || true
+else
+    # Fallback to first GIF in backgrounds dir
+    FIRST=$(find "$HOME/.config/omarchy/current/theme/backgrounds" -maxdepth 1 -name '*.gif' -print -quit 2>/dev/null)
+    [[ -n "$FIRST" ]] && awww img "$FIRST" 2>/dev/null || true
+fi
