@@ -46,6 +46,9 @@ launch() {
     echo "$file" > "$STATE_FILE"
     BASENAME=$(basename "$file")
     notify-send "Wallpaper" "Now playing: $BASENAME" -t 1500
+
+    # Update Hyprlock background
+    $HOME/.config/hypr/scripts/update-lock-bg.sh "$file" &
 }
 
 # Main

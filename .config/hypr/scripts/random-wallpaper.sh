@@ -28,3 +28,5 @@ disown
 echo "$FILE" > "$STATE_FILE"
 BASENAME=$(basename "$FILE")
 notify-send "Wallpaper" "Random: $BASENAME" -t 1500
+
+$HOME/.config/hypr/scripts/update-lock-bg.sh "$FILE" &
