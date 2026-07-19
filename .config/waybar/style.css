@@ -7,7 +7,7 @@
   border: none;
   border-radius: 0;
   min-height: 0;
-  font-family: 'JetBrainsMono Nerd Font';
+  font-family: 'Liberation Mono';
   font-size: 12px;
 }
 
@@ -79,8 +79,7 @@ tooltip {
 }
 
 #custom-screenrecording-indicator,
-#custom-idle-indicator,
-#custom-notification-silencing-indicator {
+#custom-idle-indicator {
   min-width: 12px;
   margin-left: 5px;
   margin-right: 0;
@@ -88,12 +87,8 @@ tooltip {
   padding-bottom: 1px;
 }
 
-#custom-screenrecording-indicator.active {
-  color: #a55555;
-}
-
-#custom-idle-indicator.active,
-#custom-notification-silencing-indicator.active {
+#custom-screenrecording-indicator.active,
+#custom-idle-indicator.active {
   color: #a55555;
 }
 
@@ -115,6 +110,20 @@ tooltip {
 #custom-weather {
   margin: 0 4px;
   font-size: 11px;
+}
+
+#custom-language {
+  font-size: 11px;
+  min-width: 30px;
+  margin: 0 4px;
+}
+
+#custom-language.us {
+  color: #92a593;
+}
+
+#custom-language.ur {
+  color: #E9BB4F;
 }
 
 #custom-prayer.fajr { color: #b4befe; }

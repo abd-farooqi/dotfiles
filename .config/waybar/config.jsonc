@@ -9,11 +9,11 @@
     "custom/prayer",
     "custom/weather",
     "clock",
+    "custom/language",
     "custom/update",
     "custom/voxtype",
     "custom/screenrecording-indicator",
     "custom/idle-indicator",
-    "custom/notification-silencing-indicator",
   ],
   "modules-right": [
     "group/tray-expander",
@@ -74,7 +74,7 @@
     "interval": 5,
     "format": "󰍛",
     "on-click": "omarchy-launch-or-focus-tui btop",
-    "on-click-right": "xdg-terminal-exec",
+    "on-click-right": "alacritty",
   },
   "memory": {
     "interval": 5,
@@ -84,6 +84,7 @@
   "temperature": {
     "interval": 5,
     "format": "󰔄",
+    "hwmon-path": "/sys/class/hwmon/hwmon7/temp1_input",
     "critical-threshold": 85,
     "on-click": "omarchy-launch-or-focus-tui btop",
   },
@@ -136,6 +137,7 @@
     "tooltip-format-charging": "{power:>1.0f}W↑ {capacity}%",
     "interval": 5,
     "on-click": "omarchy-menu power",
+    "on-click-right": "notify-send -u low \"$(omarchy-battery-status)\"",
     "states": {
       "warning": 20,
       "critical": 10,
@@ -180,7 +182,7 @@
     "on-scroll-right": "",
   },
   "custom/screenrecording-indicator": {
-    "on-click": "omarchy-cmd-screenrecord",
+    "on-click": "omarchy-capture-screenrecording",
     "exec": "$OMARCHY_PATH/default/waybar/indicators/screen-recording.sh",
     "signal": 8,
     "return-type": "json",
@@ -209,6 +211,14 @@
     "tooltip": true,
     "on-click-right": "omarchy-voxtype-config",
     "on-click": "omarchy-voxtype-model",
+  },
+  "custom/language": {
+    "exec": "$HOME/.config/waybar/scripts/language.sh",
+    "return-type": "json",
+    "on-click": "$HOME/.config/waybar/scripts/switch-layout.sh",
+    "signal": 14,
+    "interval": 1,
+    "tooltip": true,
   },
   "custom/prayer": {
     "exec": "$HOME/.config/waybar/scripts/prayer.sh",
