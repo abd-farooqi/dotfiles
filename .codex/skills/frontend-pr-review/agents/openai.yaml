@@ -1,0 +1,7 @@
+interface:
+  display_name: "Frontend PR Review"
+  short_description: "Review frontend PRs for architecture and quality"
+  default_prompt: "Use $frontend-pr-review to review this frontend change and report actionable findings."
+
+policy:
+  allow_implicit_invocation: true
