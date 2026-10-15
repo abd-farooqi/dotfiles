@@ -78,6 +78,42 @@ function throttleSample(text, previous) {
     ? "Measuring..." : increased ? "Events detected" : "No new events"}
 }
 
+function memoryPressure(text) {
+  var some = text.match(/^some avg10=([\d.]+)/m)
+  var full = text.match(/^full avg10=([\d.]+)/m)
+  return some && full ? {some: Number(some[1]).toFixed(2) + "%", full: Number(full[1]).toFixed(2) + "%"} : null
+}
+
+function processUsage(text, previous) {
+  var lines = text.trim().split("\n")
+  var header = lines.shift().split("\t").map(Number)
+  if (header.length !== 3 || !header.every(function(n) { return isFinite(n) && n > 0 })) return null
+  var snapshot = {time: header[0], processes: {}}
+  var groups = {}
+  var elapsed = previous ? snapshot.time - previous.time : 0
+  lines.forEach(function(line) {
+    var parts = line.split("\t")
+    if (parts.length !== 5 || !parts.slice(0, 4).every(function(n) { return /^\d+$/.test(n) })) return
+    var key = parts[0] + ":" + parts[1]
+    var ticks = Number(parts[2])
+    snapshot.processes[key] = ticks
+    var name = parts[4]
+    var groupKey = "$" + name
+    if (!Object.prototype.hasOwnProperty.call(groups, groupKey)) groups[groupKey] = {name: name, cpu: 0, bytes: 0, count: 0}
+    var group = groups[groupKey]
+    group.count++
+    group.bytes += Number(parts[3]) * header[2]
+    if (elapsed > 0 && previous.processes[key] !== undefined)
+      group.cpu += Math.max(0, ticks - previous.processes[key]) / header[1] / elapsed * 100
+  })
+  var rows = Object.keys(groups).map(function(key) { return groups[key] })
+  return {snapshot: snapshot, ready: elapsed > 0,
+    cpu: rows.slice().sort(function(a, b) { return b.cpu - a.cpu || a.name.localeCompare(b.name) }).slice(0, 3)
+      .map(function(row) { return {name: row.name, count: row.count, value: row.cpu.toFixed(1) + "%"} }),
+    memory: rows.filter(function(row) { return row.bytes > 0 }).sort(function(a, b) { return b.bytes - a.bytes }).slice(0, 3)
+      .map(function(row) { return {name: row.name, count: row.count, value: (row.bytes / 1048576).toFixed(0) + " MiB"} })}
+}
+
 function memory(text) {
   var values = {}
   text.split("\n").forEach(function(line) {

@@ -8,6 +8,8 @@ Theme-matched widgets for the current **Omarchy Quickshell bar**:
 
 Power profiles stay in the existing battery panel. An installed Slack status widget hides when empty.
 
+CPU and RAM panels show their top three consumers, grouped by process name. CPU is measured between samples (100% is one full core); RAM uses RSS, which includes shared pages and can overcount shared memory. The RAM panel also shows memory pressure: the percentage of time some or all active tasks waited for memory over the last 10 seconds. Scroll or use arrow keys to reach additional details.
+
 ## Install
 
 Run in your Omarchy desktop session, **without sudo**:
