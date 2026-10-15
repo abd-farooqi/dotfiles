@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "bar": {
+    "position": "bottom",
+    "transparent": true,
+    "layout": {
+      "left": [{"id": "custom.launcher", "keep": 123}],
+      "center": [{"id": "omarchy.clock", "format": "HH:mm"}],
+      "right": [{"id": "petrzpav.slack"}, {"id": "omarchy.power", "showPercentage": true}]
+    }
+  },
+  "idle": {"lock": 777},
+  "plugins": [{"id": "custom.service"}]
+}
