@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Commons
 import qs.Ui
+import "ScrollModel.js" as ScrollModel
 
 BarWidget {
   id: root
@@ -151,6 +152,19 @@ BarWidget {
         contentHeight: historyColumn.implicitHeight
         clip: true
         boundsBehavior: Flickable.StopAtBounds
+        maximumFlickVelocity: Style.space(3500)
+        flickDeceleration: 1500
+        WheelHandler {
+          target: null
+          acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+          onWheel: function(event) {
+            historyScroll.cancelFlick()
+            historyScroll.contentY = ScrollModel.scrollPosition(historyScroll.contentY,
+              historyScroll.contentHeight, historyScroll.height, event.pixelDelta.y,
+              event.angleDelta.y, Style.space(90))
+            event.accepted = true
+          }
+        }
         Column {
           id: historyColumn
           width: parent.width

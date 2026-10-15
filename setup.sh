@@ -26,8 +26,8 @@ done
 
 fail() { printf 'Error: %s\n' "$*" >&2; exit 1; }
 
-for dependency in jq curl btop; do
-  command -v "$dependency" >/dev/null || fail "Missing $dependency. Run: sudo pacman -S --needed jq curl btop"
+for dependency in jq curl; do
+  command -v "$dependency" >/dev/null || fail "Missing $dependency. Run: sudo pacman -S --needed jq curl"
 done
 [[ -f "$omarchy_path/shell/shell.qml" && -f "$omarchy_path/shell/Ui/KeyboardPanel.qml" ]] \
   || fail 'This setup requires the current Omarchy Quickshell bar, not legacy Waybar.'

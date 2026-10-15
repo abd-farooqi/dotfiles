@@ -3,9 +3,9 @@ const fs = require("node:fs")
 const path = require("node:path")
 const vm = require("node:vm")
 
-function model(id) {
+function model(id, filename = "Model.js") {
   const context = vm.createContext({})
-  vm.runInContext(fs.readFileSync(path.join(__dirname, "..", ".config", "omarchy", "plugins", id, "Model.js"), "utf8"), context)
+  vm.runInContext(fs.readFileSync(path.join(__dirname, "..", ".config", "omarchy", "plugins", id, filename), "utf8"), context)
   return context
 }
 
@@ -15,6 +15,27 @@ assert.equal(usage.cpuPercent(null, {total: 100, idle: 60}), null)
 assert.equal(usage.cpuSample("cpu 10 20 30 40 5 6 7 8 100 100").total, 126)
 assert.equal(usage.memory("MemTotal: 1000 kB\nMemAvailable: 400 kB\nSwapTotal: 100 kB\nSwapFree: 50 kB").percent, 60)
 assert.equal(usage.memory("MemTotal: 0 kB"), null)
+const samples = usage.cpuSamples("cpu 10 20 30 40 5 6 7 8\ncpu0 5 10 15 20 2 3 4 5\nintr 123")
+assert.equal(Object.keys(samples).length, 2)
+assert.equal(samples.cpu0.total, 64)
+assert.equal(usage.cpuInfo("model name: Intel(R) Test(TM)\ncpu MHz: 1000\ncpu MHz: 2000").frequency, "1.50 GHz")
+assert.equal(usage.cpuInfo("Hardware: ARM Test").model, "ARM Test")
+assert.equal(usage.cpuInfo("").frequency, "Unavailable")
+assert.equal(usage.loadAverage("1.00 2.00 3.00 2/123 456"), "1.00 / 2.00 / 3.00")
+assert.equal(usage.loadAverage("bad"), "Unavailable")
+assert.equal(usage.uptime("90061.0 123.0"), "1d 1h 1m")
+assert.equal(usage.uptime(""), "Unavailable")
+const detailedMemory = usage.memory("MemTotal: 4194304 kB\nMemAvailable: 2097152 kB\nMemFree: 1048576 kB\nCached: 1048576 kB\nShmem: 524288 kB\nBuffers: 0 kB\nSReclaimable: 524288 kB")
+assert.equal(detailedMemory.cache, "1.0")
+assert.equal(detailedMemory.free, "1.0")
+assert.equal(detailedMemory.swap, "0.0")
+
+const scroll = model("abdullah.desktop-status", "ScrollModel.js")
+assert.equal(scroll.scrollPosition(100, 1000, 400, 0, -120, 90), 190)
+assert.equal(scroll.scrollPosition(100, 1000, 400, -20, 0, 90), 140)
+assert.equal(scroll.scrollPosition(550, 1000, 400, 0, -120, 90), 600)
+assert.equal(scroll.scrollPosition(10, 1000, 400, 20, 0, 90), 0)
+assert.equal(scroll.scrollPosition(0, 200, 400, 0, -120, 90), 0)
 
 const prayer = model("abdullah.prayer-times")
 const days = [{date: {gregorian: {day: "15", month: {number: 10}, year: "2026"}, readable: "15 Oct 2026"},
@@ -28,4 +49,4 @@ assert.equal(prayer.display(days, new Date("2026-10-15T20:00:00Z"), "Test", "", 
 assert.equal(prayer.dayKey(new Date("2026-10-31T23:00:00Z"), 18000), "2026-11-1")
 assert.equal(prayer.dayKey(new Date("2026-11-01T01:00:00Z"), -18000), "2026-10-31")
 assert.equal(prayer.display([], new Date(), "", "Offline").rows.length, 0)
-console.log("PASS: CPU deltas, memory accounting, prayer selection, timezone/day/month boundaries, unavailable data")
+console.log("PASS: CPU/core metrics, memory breakdown, fast wheel/touchpad scrolling and bounds, prayer timezone boundaries")
