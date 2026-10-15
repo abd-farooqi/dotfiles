@@ -3,7 +3,7 @@
 Theme-matched widgets for the current **Omarchy Quickshell bar**:
 
 - **Prayer times:** automatic city detection by public IP, Hanafi Asr, and a click-open timetable showing five prayers plus sunrise.
-- **CPU and RAM:** icons with live percentages and click-open quick-info panels. CPU shows per-core usage, clock, temperature, load, governor, and uptime; memory shows used, available, cached, shared, and swap memory.
+- **CPU and RAM:** icons with live percentages and click-open quick-info panels. CPU shows per-core usage, clock, temperature, load, active power profile, and uptime; memory shows used, available, cached, shared, and swap memory. The CPU footer labels the kernel governor separately; Intel's dynamic `powersave` governor can coexist with the Performance power profile.
 - **Notifications:** a bell opening recent history with a Do Not Disturb toggle.
 
 Power profiles stay in the existing battery panel. An installed Slack status widget hides when empty.
@@ -34,7 +34,7 @@ The installer copies only these three plugins, merges their entries into your ex
 
 Prayer location is checked every 15 minutes using [IPWhois](https://ipwhois.io/documentation); timings come from [AlAdhan](https://aladhan.com/prayer-times-api) using the Karachi method and Hanafi Asr. IP location is approximate and follows your VPN exit location. These are calculated prayer start times, not mosque jamaat times. Internet is required to load prayer times; network failures show a retry message.
 
-CPU/RAM update every second. Only the selected CPU or RAM icon is underlined while its panel is open. Unavailable CPU sensors are marked as such. RAM usage treats reclaimable cache as available. Notifications use Omarchy's existing local history with faster wheel/touchpad scrolling; only notifications received by its daemon are available.
+CPU/RAM update every second. CPU power preference reads the hardware's energy/performance preference. Thermal throttling reports increases in kernel event/time counters since the previous sample, rather than an instantaneous throttle flag; unsupported hardware shows Unavailable. Only the selected CPU or RAM icon is underlined while its panel is open. Unavailable CPU sensors are marked as such. RAM usage treats reclaimable cache as available. Notifications use Omarchy's existing local history with faster wheel/touchpad scrolling; only notifications received by its daemon are available.
 
 ## Options and troubleshooting
 

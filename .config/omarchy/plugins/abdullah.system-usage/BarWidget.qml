@@ -16,6 +16,12 @@ BarWidget {
   property string load: "Unavailable"
   property string uptimeText: "Unavailable"
   property string governor: "Unavailable"
+  property string powerProfile: ""
+  property string scalingDriver: ""
+  property string preference: "Unavailable"
+  property var throttleValues: null
+  property string throttling: "Measuring..."
+  readonly property var profileInfo: Model.powerState(powerProfile, governor, scalingDriver)
   property string temperaturePath: ""
   property string temperature: "Unavailable"
   property bool opened: false
@@ -26,7 +32,9 @@ BarWidget {
     {label: "Temperature", value: temperature},
     {label: "Load (1 / 5 / 15 min)", value: load},
     {label: "Logical CPUs", value: String(coreRows.length)},
-    {label: "Governor", value: governor},
+    {label: "Power profile", value: profileInfo.profile},
+    {label: "Power preference", value: preference},
+    {label: "Thermal throttling", value: throttling},
     {label: "Uptime", value: uptimeText}
   ] : [
     {label: "Used", value: ram ? ram.used + " GiB" : "--"},
@@ -43,10 +51,18 @@ BarWidget {
       loadFile.reload()
       uptimeFile.reload()
       governorFile.reload()
+      driverFile.reload()
+      preferenceFile.reload()
+      if (!throttleProc.running) throttleProc.running = true
+      if (!powerProfileProc.running) powerProfileProc.running = true
       if (temperaturePath) temperatureFile.reload()
     } else memoryFile.reload()
   }
   function open(kind) {
+    if (!opened || panelKind !== kind) {
+      throttleValues = null
+      throttling = "Measuring..."
+    }
     panelKind = kind === "memory" ? "memory" : "cpu"
     opened = true
     refreshDetails()
@@ -97,11 +113,47 @@ BarWidget {
     onLoaded: root.uptimeText = Model.uptime(text())
   }
   FileView {
+    id: driverFile
+    path: "/sys/devices/system/cpu/cpu0/cpufreq/scaling_driver"
+    printErrors: false
+    onLoaded: root.scalingDriver = text().trim()
+    onLoadFailed: root.scalingDriver = ""
+  }
+  Process {
+    id: powerProfileProc
+    command: ["timeout", "2s", "powerprofilesctl", "get"]
+    stdout: StdioCollector { onStreamFinished: root.powerProfile = text.trim() }
+    onExited: function(exitCode, exitStatus) {
+      if (exitCode !== 0) root.powerProfile = ""
+    }
+  }
+  FileView {
     id: governorFile
     path: "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"
     printErrors: false
     onLoaded: root.governor = text().trim() || "Unavailable"
     onLoadFailed: root.governor = "Unavailable"
+  }
+  FileView {
+    id: preferenceFile
+    path: "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference"
+    printErrors: false
+    onLoaded: root.preference = Model.powerPreference(text())
+    onLoadFailed: root.preference = "Unavailable"
+  }
+  Process {
+    id: throttleProc
+    command: ["bash", "-c", "for f in /sys/devices/system/cpu/cpu[0-9]*/thermal_throttle/*_throttle_count /sys/devices/system/cpu/cpu[0-9]*/thermal_throttle/*_throttle_total_time_ms; do if [ -r \"$f\" ]; then read -r value < \"$f\"; printf '%s %s\\n' \"$f\" \"$value\"; fi; done"]
+    stdout: StdioCollector {
+      onStreamFinished: {
+        var sample = Model.throttleSample(text, root.throttleValues)
+        root.throttleValues = sample.values
+        root.throttling = sample.status
+      }
+    }
+    onExited: function(exitCode, exitStatus) {
+      if (exitCode !== 0) { root.throttleValues = null; root.throttling = "Unavailable" }
+    }
   }
   Process {
     id: sensorDiscovery
@@ -181,7 +233,7 @@ BarWidget {
     open: root.opened
     focusTarget: keys
     contentWidth: panel.fittedContentWidth(Style.space(370))
-    contentHeight: panel.fittedContentHeight(Math.min(info.implicitHeight, Style.space(580)))
+    contentHeight: panel.fittedContentHeight(Math.min(info.implicitHeight, Style.space(680)))
 
     PanelKeyCatcher {
       id: keys
@@ -308,7 +360,7 @@ BarWidget {
           }
           Text {
             width: parent.width
-            text: root.cpuPanel ? "Live every second · Load is queued/running work, not a percentage.\nTab to switch to memory · Esc to close"
+            text: root.cpuPanel ? "Kernel governor: " + root.profileInfo.governor + "\nThrottling: new events/time since last sample.\nLive every second · Tab for memory · Esc to close"
               : "Available includes reclaimable cache. Figures overlap; don't add the rows.\nLive every second · Tab for CPU · Esc to close"
             color: Color.foreground
             opacity: 0.55

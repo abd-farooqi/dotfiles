@@ -51,6 +51,33 @@ function uptime(text) {
   return (days ? days + "d " : "") + Math.floor(minutes % 1440 / 60) + "h " + minutes % 60 + "m"
 }
 
+function powerState(profile, governor, driver) {
+  var names = {performance: "Performance", balanced: "Balanced", "power-saver": "Power saver"}
+  var selected = String(profile || "").trim()
+  return {profile: Object.prototype.hasOwnProperty.call(names, selected) ? names[selected] : "Unavailable",
+    governor: governor === "powersave" && driver === "intel_pstate"
+      ? "powersave (dynamic)" : governor || "Unavailable"}
+}
+
+function powerPreference(text) {
+  var names = {performance: "Performance", balance_performance: "Favor performance",
+    balance_power: "Favor efficiency", power: "Power saving", default: "Driver default"}
+  return Object.prototype.hasOwnProperty.call(names, String(text).trim()) ? names[String(text).trim()] : "Unavailable"
+}
+
+function throttleSample(text, previous) {
+  var values = {}
+  text.trim().split("\n").forEach(function(line) {
+    var parts = line.trim().split(/\s+/)
+    if (parts.length === 2 && /^\d+$/.test(parts[1])) values[parts[0]] = Number(parts[1])
+  })
+  var keys = Object.keys(values)
+  var comparable = keys.filter(function(key) { return previous && previous[key] !== undefined })
+  var increased = comparable.some(function(key) { return values[key] > previous[key] })
+  return {values: values, status: !keys.length ? "Unavailable" : !comparable.length
+    ? "Measuring..." : increased ? "Events detected" : "No new events"}
+}
+
 function memory(text) {
   var values = {}
   text.split("\n").forEach(function(line) {
